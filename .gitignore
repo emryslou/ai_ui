@@ -1,0 +1,6 @@
+build/
+data/
+dist/
+.vscode/
+Pipfile
+*.spec

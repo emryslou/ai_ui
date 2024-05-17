@@ -1,0 +1,4 @@
+pyinstaller
+pyinstaller-hooks-contrib
+pywebview
+cefpython3

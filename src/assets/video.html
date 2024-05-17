@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>访问摄像头示例</title>
+  <script>
+    function startCamera() {
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then(function (stream) {
+          var video = document.querySelector('video');
+          video.srcObject = stream;
+          video.play();
+        })
+        .catch(function (error) {
+          console.error('访问摄像头失败：', error);
+        });
+    }
+
+    /**
+      * Stops the camera and cleans up the video element.
+      */
+    function stopCamera() {
+      var video = document.querySelector('video');
+      video.srcObject.getTracks().forEach(function (track) {
+        track.stop();
+      });
+      video.srcObject = null;
+    }
+
+    startCamera()
+  </script>
+</head>
+
+<body>
+  <div>
+    <div style="width: 100%; height:93vh;">
+      <video style="width: 100%; height: 100%"></video>
+    </div>
+    <div style="width: 100%; height:5vh;">
+      <button onclick="startCamera()">开始摄像头</button>
+      <button onclick="stopCamera()">停止摄像头</button>
+    </div>
+  </div>
+</body>
+
+</html>
