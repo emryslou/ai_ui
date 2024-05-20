@@ -5,6 +5,7 @@
   <title>AI 助手</title>
   <style>
     body {
+      overflow: hidden;
       font-family: Arial, Helvetica, sans-serif;
     }
     
@@ -180,6 +181,8 @@
       <button class="dropbtn">AI助手</button>
       <div class="dropdown-content">
         <a href="javascript:void(0);" class="refresh">刷新</a>
+        <a href="javascript:void(0);" class="chat_frame" name="chat">聊天</a>
+        <a href="javascript:void(0);" class="paint_frame" name="paint">画图</a>
       </div>
     </div>
     <div class="dropdown">
@@ -210,30 +213,33 @@
        loadingDiv.style.display = 'none';
       }
     }
-    function loadIframe(refresh = false) {
-      window.pywebview.api.chat_uri().then((src_uri) => {
-        fetch(src_uri).then(resp => {
-          if (!resp.ok) {
-            throw new Error(resp.statusText);
-          }
-          const iframe = document.querySelector('iframe');
-          if (refresh === true) {
-            src_uri = src_uri + '?_=' + (new Date).getUTCSeconds()
-          }
-          iframe.src = src_uri;
-          iframe.style.display = 'block';
-          loadingMessage();
-          pywebview.api.success();
-        }).catch(err => {
+    function loadIframe(uri_name = undefined, refresh = false) {
+      if (refresh === true) {
+        const iframe = document.querySelector('iframe');
+        iframe.style.display = 'none';
+        loadingMessage('1');
+        iframe.src = iframe.src + '?_=' + (new Date).getUTCSeconds()
+        loadingMessage();
+        iframe.style.display = 'block';
+      } else {
+        uri_name = uri_name == undefined ? 'chat' : uri_name
+        window.pywebview.api.uri_by_name(uri_name).then((src_uri) => {
+          fetch(src_uri).then(resp => {
+            if (!resp.ok) {
+              throw new Error(resp.statusText);
+            }
+            const iframe = document.querySelector('iframe');
+            iframe.src = src_uri;
+            iframe.style.display = 'block';
+            loadingMessage();
+            pywebview.api.success(uri_name);
+          }).catch(err => {
+            pywebview.api.error(err, uri_name, src_uri);
+          });
+        }).catch((e) => {
           pywebview.api.error();
         });
-      }).catch((e) => {
-        pywebview.api.error();
-      });
-    }
-    function reloadIframe() {
-      const iframe = document.querySelector('iframe');
-      iframe.contentWindow.location.reload()
+      }
     }
 
     function toggle_btn(ele, tag) {
@@ -262,7 +268,7 @@
         pywebview.api.min_win();
       });
       document.querySelector('a.refresh').addEventListener('click', function(){
-        loadIframe(true);
+        loadIframe(undefined, true);
       });
       document.querySelector('a.resize_small').addEventListener('click', function(){
         window.pywebview.api.resize_win('small')
@@ -272,6 +278,16 @@
       });
       document.querySelector('a.refresh_large').addEventListener('click', function(){
         window.pywebview.api.resize_win('large')
+      });
+      document.querySelector('a.chat_frame').addEventListener('click', function(event){
+        const iframe = document.querySelector('iframe');
+        iframe.scrolling = 'no'
+        loadIframe(event.currentTarget.getAttribute('name'))
+      });
+      document.querySelector('a.paint_frame').addEventListener('click', function(event){
+        const iframe = document.querySelector('iframe');
+        iframe.scrolling = ''
+        loadIframe(event.currentTarget.getAttribute('name'))
       });
     }
 

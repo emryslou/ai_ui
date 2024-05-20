@@ -1,7 +1,9 @@
 build/
 data/
 dist/
+src/app.data
 .vscode/
 Pipfile
 *.spec
+.env
 __pycache__/
